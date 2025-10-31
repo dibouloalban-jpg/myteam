@@ -2,5 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom */
+:root{
+  --primary: #60A5FA; /* bleu clair */
+  --primary-600: #2563EB;
+  --bg: #ffffff;
+}
+
+body {
+  background: var(--bg);
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+}
+
 
 
