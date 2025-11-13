@@ -1,22 +1,31 @@
-import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, {useEffect, useState} from 'react'
+import OwnerDashboard from './OwnerDashboard'
+import WorkerDashboard from './WorkerDashboard'
+import { supabase } from '../lib/supabaseClient'
+import Loader from '../components/Loader'
 
-export default function Dashboard() {
-  const navigate = useNavigate();
+export default function Dashboard(){
+  const [loading, setLoading] = useState(true)
+  const [role, setRole] = useState(null)
+  const [user, setUser] = useState(null)
 
-  return (
-    <main style={{ padding: 16 }}>
-      <h1>Dashboard</h1>
-      <p>Vue d’ensemble.</p>
+  useEffect(()=>{
+    async function init(){
+      const { data } = await supabase.auth.getSession()
+      const u = data?.session?.user
+      if(u) {
+        setUser(u)
+        // Here you would fetch role from a users table
+        // For demo: default to 'owner' if user's email contains 'owner'
+        const r = u?.email?.includes('owner') ? 'owner' : 'worker'
+        setRole(r)
+      }
+      setLoading(false)
+    }
+    init()
+  },[])
 
-      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-        <button onClick={() => navigate("/team")}>Voir Team</button>
-        <button onClick={() => navigate("/task")}>Voir Task</button>
-      </div>
-
-      <div style={{ marginTop: 12 }}>
-        <Link to="/">Home</Link>
-      </div>
-    </main>
-  );
+  if(loading) return <Loader />
+  if(role==='owner') return <OwnerDashboard user={user} />
+  return <WorkerDashboard user={user} />
 }
